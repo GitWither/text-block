@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "text_block:block/text_block"
+    }
+  }
+}

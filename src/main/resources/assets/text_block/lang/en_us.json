@@ -1,0 +1,9 @@
+{
+  "block.text_block.text_block": "Text Block",
+  "gui.text_block.text": "Text",
+  "gui.text_block.billboard": "Billboard",
+  "gui.text_block.distance_scale": "Distance Scale",
+  "gui.text_block.offset": "Offset",
+  "gui.text_block.rotation": "Rotation",
+  "gui.text_block.scale": "Scale"
+}
