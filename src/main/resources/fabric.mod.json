@@ -3,9 +3,18 @@
   "id": "text_block",
   "version": "${version}",
   "name": "Text Block",
-  "description": "",
-  "authors": [],
-  "contact": {},
+  "description": "Add floating text of any kind to your world. A sign but cooler!",
+  "authors": [
+    "Daniel K."
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/text-block",
+    "sources": "https://github.com/GitWither/text-block",
+    "issues": "https://github.com/GitWither/text-block/issues",
+    "discord": "https://discord.gg/WtdP245E8Q",
+    "email": "wither.tweets@gmail.com",
+    "twitter": "https://twitter.com/_Daniel_K_"
+  },
   "license": "MIT",
   "icon": "assets/text_block/icon.png",
   "environment": "*",
@@ -23,6 +32,14 @@
   "depends": {
     "fabricloader": ">=0.14.9",
     "fabric": "*",
-    "minecraft": "1.19.2"
+    "minecraft": ">=1.19"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/WtdP245E8Q",
+        "modmenu.twitter": "https://twitter.com/_Daniel_K_"
+      }
+    }
   }
 }
