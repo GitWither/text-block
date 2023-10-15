@@ -47,14 +47,12 @@ public class TextBlockRenderer implements BlockEntityRenderer<TextBlockEntity> {
             matrices.scale(distance, distance, distance);
         }
 
-        float opacityOption = MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25f);
-        int opacity = (int)(opacityOption * 255.0f) << 24;
 
         Matrix4f pos = matrices.peek().getPositionMatrix();
 
 
         float x = -textRenderer.getWidth(entity.getText()) / 2f;
-        textRenderer.draw(entity.getText(), x, 0, 0x20FFFFFF, false, pos, vertexConsumers, TextRenderer.TextLayerType.NORMAL, opacity, light);
+        textRenderer.draw(entity.getText(), x, 0, 0xFFFFFFFF, false, pos, vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, light);
 
         matrices.pop();
     }

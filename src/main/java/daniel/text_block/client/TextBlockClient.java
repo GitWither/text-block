@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 
@@ -22,7 +23,7 @@ import java.util.Set;
 public class TextBlockClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        BlockEntityRendererRegistry.register(TextBlock.TEXT_BLOCK_ENTITY, TextBlockRenderer::new);
+        BlockEntityRendererFactories.register(TextBlock.TEXT_BLOCK_ENTITY, TextBlockRenderer::new);
 
         ClientPlayNetworking.registerGlobalReceiver(TextBlock.OPEN_TEXT_BLOCK_SCREEN_PACKET_ID, (client, handler, buf, responseSender) -> {
             BlockPos pos = buf.readBlockPos();

@@ -128,20 +128,22 @@ public class TextBlockScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShaderTexture(0, TEXTURE);
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.renderBackground(context, mouseX, mouseY, delta);
+
         int i = this.x;
         int j = (this.height - this.backgroundHeight) / 2;
         context.drawTexture(TEXTURE, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
+    }
+
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
 
         context.drawText(this.textRenderer, Text.translatable("gui.text_block.text"), this.x + 3, this.y + 5, 0x404040, false);
 
         context.drawText(this.textRenderer, Text.translatable("gui.text_block.offset"), this.x + 3, this.y + 64, 0x404040, false);
         context.drawText(this.textRenderer, Text.translatable("gui.text_block.rotation"), this.x + 3, this.y + 98, 0x404040, false);
         context.drawText(this.textRenderer, Text.translatable("gui.text_block.scale"), this.x + 3, this.y + 132, 0x404040, false);
-
-        super.render(context, mouseX, mouseY, delta);
     }
 }
