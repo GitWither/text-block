@@ -3,6 +3,7 @@ package daniel.text_block;
 import daniel.text_block.block.TextBlockBlock;
 import daniel.text_block.block.entity.TextBlockEntity;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;
@@ -12,31 +13,33 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 
 public class TextBlock implements ModInitializer {
 
     public static final String MOD_ID = "text_block";
 
     public static final Block TEXT_BLOCK = Registry.register(
-            Registry.BLOCK,
+            Registries.BLOCK,
             new Identifier(MOD_ID, "text_block"),
             new TextBlockBlock()
     );
 
     public static final Item TEXT_BLOCK_ITEM = Registry.register(
-            Registry.ITEM,
+            Registries.ITEM,
             new Identifier(MOD_ID, "text_block"),
-            new BlockItem(TEXT_BLOCK, new Item.Settings().group(ItemGroup.DECORATIONS))
+            new BlockItem(TEXT_BLOCK, new Item.Settings())
     );
 
     public static final BlockEntityType<TextBlockEntity> TEXT_BLOCK_ENTITY =
             Registry.register(
-                    Registry.BLOCK_ENTITY_TYPE,
+                    Registries.BLOCK_ENTITY_TYPE,
                     new Identifier(MOD_ID, "text_block"),
                     FabricBlockEntityTypeBuilder.create(TextBlockEntity::new, TEXT_BLOCK).build()
             );
@@ -47,6 +50,10 @@ public class TextBlock implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
+            content.add(TEXT_BLOCK_ITEM);
+        });
+
         ServerPlayNetworking.registerGlobalReceiver(TEXT_BLOCK_UPDATE_PACKET, (server, player, handler, buf, responseSender) -> {
             BlockPos pos = buf.readBlockPos();
             Text text = buf.readText();
@@ -62,7 +69,7 @@ public class TextBlock implements ModInitializer {
             float scaleY = buf.readFloat();
             float scaleZ = buf.readFloat();
             server.execute(() -> {
-                ServerWorld world = player.getWorld();
+                ServerWorld world = player.getServerWorld();
                 BlockEntity textBlock = world.getBlockEntity(pos);
                 BlockState state = world.getBlockState(pos);
                 if (!(textBlock instanceof TextBlockEntity textBlockEntity)) return;

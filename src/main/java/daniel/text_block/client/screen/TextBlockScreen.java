@@ -4,22 +4,20 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import daniel.text_block.TextBlock;
 import daniel.text_block.block.entity.TextBlockEntity;
 import daniel.text_block.client.gui.widget.NumberTextFieldWidget;
-import daniel.text_block.client.gui.widget.VectorSliderWidget;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.text.DecimalFormat;
@@ -57,8 +55,6 @@ public class TextBlockScreen extends Screen {
     protected void init() {
         super.init();
 
-        this.client.keyboard.setRepeatEvents(true);
-
         this.x = (this.width - this.backgroundWidth) / 2;
         this.y = (this.height - this.backgroundHeight) / 2;
 
@@ -87,15 +83,19 @@ public class TextBlockScreen extends Screen {
             this.addDrawableChild(scaleWidgets[i]);
         }
 
-        this.addDrawableChild(new ButtonWidget(this.x, this.y + 167, 176, 20, ScreenTexts.DONE,button -> {
-            textBlock.markDirty();
-            this.close();
-        }));
+        this.addDrawableChild(
+                ButtonWidget.builder(ScreenTexts.DONE, button -> {
+                    textBlock.markDirty();
+                    this.close();
+                })
+                        .size(176, 20)
+                        .position(this.x, this.y + 167)
+                        .build()
+        );
     }
 
     @Override
     public void removed() {
-        this.client.keyboard.setRepeatEvents(false);
         PacketByteBuf data = PacketByteBufs.create();
         data.writeBlockPos(this.textBlock.getPos());
 
@@ -128,25 +128,20 @@ public class TextBlockScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(MatrixStack matrices, int vOffset) {
-        super.renderBackground(matrices, vOffset);
-    }
-
-    @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.setShaderTexture(0, TEXTURE);
         int i = this.x;
         int j = (this.height - this.backgroundHeight) / 2;
-        this.drawTexture(matrices, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        context.drawTexture(TEXTURE, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
 
-        this.textRenderer.draw(matrices, Text.translatable("gui.text_block.text"), this.x + 3, this.y + 5, 0x404040);
+        context.drawText(this.textRenderer, Text.translatable("gui.text_block.text"), this.x + 3, this.y + 5, 0x404040, false);
 
-        this.textRenderer.draw(matrices, Text.translatable("gui.text_block.offset"), this.x + 3, this.y + 64, 0x404040);
-        this.textRenderer.draw(matrices, Text.translatable("gui.text_block.rotation"), this.x + 3, this.y + 98, 0x404040);
-        this.textRenderer.draw(matrices, Text.translatable("gui.text_block.scale"), this.x + 3, this.y + 132, 0x404040);
+        context.drawText(this.textRenderer, Text.translatable("gui.text_block.offset"), this.x + 3, this.y + 64, 0x404040, false);
+        context.drawText(this.textRenderer, Text.translatable("gui.text_block.rotation"), this.x + 3, this.y + 98, 0x404040, false);
+        context.drawText(this.textRenderer, Text.translatable("gui.text_block.scale"), this.x + 3, this.y + 132, 0x404040, false);
 
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
     }
 }

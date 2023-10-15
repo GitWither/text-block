@@ -2,21 +2,22 @@ package daniel.text_block.client.render.block;
 
 import daniel.text_block.block.entity.TextBlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3f;
+import org.joml.*;
 
 public class TextBlockRenderer implements BlockEntityRenderer<TextBlockEntity> {
 
-    public TextBlockRenderer(BlockEntityRendererFactory.Context ctx) {}
+    private final TextRenderer textRenderer;
+
+    public TextBlockRenderer(BlockEntityRendererFactory.Context ctx) {
+        this.textRenderer = ctx.getTextRenderer();
+    }
 
     @Override
     public void render(TextBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
@@ -25,16 +26,19 @@ public class TextBlockRenderer implements BlockEntityRenderer<TextBlockEntity> {
         matrices.push();
 
         matrices.translate(0.5f, 1, 0.5f);
-        Vec3f scale = entity.getScale();
-        Vec3f offset = entity.getOffset();
+
+        Vector3f scale = entity.getScale();
+        Vector3f offset = entity.getOffset();
+        Vector3f rotation = entity.getRotation();
+
         if (entity.isBillboard()) {
             matrices.multiply(dispatcher.getRotation());
-            matrices.scale(-scale.getX(), -scale.getY(), scale.getZ());
+            matrices.scale(-scale.x(), -scale.y(), scale.z());
         }
         else {
-            matrices.translate(offset.getX(), offset.getY(), offset.getZ());
-            matrices.multiply(Quaternion.fromEulerXyzDegrees(entity.getRotation()));
-            matrices.scale(scale.getX(), -scale.getY(), scale.getZ());
+            matrices.translate(offset.x(), offset.y(), offset.z());
+            matrices.multiply(new Quaternionf().rotationXYZ(rotation.x(), rotation.y(), rotation.z()));
+            matrices.scale(scale.x(), -scale.y(), scale.z());
         }
 
         if (entity.isDistanceScaled()) {
@@ -43,7 +47,15 @@ public class TextBlockRenderer implements BlockEntityRenderer<TextBlockEntity> {
             matrices.scale(distance, distance, distance);
         }
 
-        DrawableHelper.drawCenteredText(matrices, MinecraftClient.getInstance().textRenderer, entity.getText(), 0, 0, 0xffffff);
+        float opacityOption = MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25f);
+        int opacity = (int)(opacityOption * 255.0f) << 24;
+
+        Matrix4f pos = matrices.peek().getPositionMatrix();
+
+
+        float x = -textRenderer.getWidth(entity.getText()) / 2f;
+        textRenderer.draw(entity.getText(), x, 0, 0x20FFFFFF, false, pos, vertexConsumers, TextRenderer.TextLayerType.NORMAL, opacity, light);
+
         matrices.pop();
     }
 }
